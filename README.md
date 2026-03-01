@@ -1,0 +1,84 @@
+# MCP Time Server
+
+**by [One Shot Ship](https://www.oneshotship.com)**
+
+A free, hosted MCP server providing accurate time and timezone tools for Claude Code — including remote `/cowork` sessions.
+
+## Quick Setup
+
+```bash
+claude mcp add --transport http time-server https://oss-mcp-time.onrender.com/mcp
+```
+
+With timezone hint (recommended):
+
+```bash
+claude mcp add --transport http \
+  --header "X-Timezone: America/New_York" \
+  time-server https://oss-mcp-time.onrender.com/mcp
+```
+
+Replace `America/New_York` with your [IANA timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+
+## Available Tools
+
+### `get_current_time`
+
+Returns current time, date, UTC offset, and DST status for any IANA timezone.
+
+**Parameters:**
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `timezone` | Yes | IANA timezone string (e.g., `America/New_York`) |
+
+**Example response:**
+```json
+{
+  "datetime": "2026-03-02T14:30:00",
+  "timezone": "America/New_York",
+  "utc_offset": "-05:00",
+  "is_dst": false
+}
+```
+
+### `convert_time`
+
+Converts a time from one timezone to another.
+
+**Parameters:**
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `source_timezone` | Yes | Source IANA timezone |
+| `time` | Yes | Time in HH:MM format |
+| `target_timezone` | Yes | Target IANA timezone |
+| `date` | No | Date in YYYY-MM-DD format (defaults to today) |
+
+**Example response:**
+```json
+{
+  "source": "14:00",
+  "target": "19:00",
+  "source_timezone": "America/New_York",
+  "target_timezone": "Europe/London",
+  "utc_offset_source": "-05:00",
+  "utc_offset_target": "+00:00"
+}
+```
+
+## Why?
+
+Claude Code `/cowork` (remote) sessions run on Anthropic's infrastructure, not your machine. Local MCP servers like `mcp-server-time` aren't accessible. This hosted server solves that.
+
+## Self-Hosting
+
+```bash
+git clone https://github.com/YOUR_USERNAME/oss-mcp-time.git
+cd oss-mcp-time
+npm install
+npm run build
+npm start
+```
+
+## License
+
+MIT
