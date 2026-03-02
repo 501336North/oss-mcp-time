@@ -1,0 +1,11 @@
+services:
+  - type: web
+    runtime: node
+    name: oss-mcp-time
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: node dist/transport.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /health

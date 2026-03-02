@@ -1,7 +1,37 @@
 import express from 'express';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { getLandingHtml } from './landing.js';
+import { createMcpServer } from './server.js';
 
 export function createApp(): express.Express {
   const app = express();
+  app.use(express.json({ limit: '100kb' }));
+
+  app.get('/health', (_req, res) => {
+    res.json({ status: 'ok' });
+  });
+
+  app.get('/', (_req, res) => {
+    res.type('html').send(getLandingHtml());
+  });
+
+  app.post('/mcp', async (req, res) => {
+    const timezoneHint = req.headers['x-timezone'] as string | undefined;
+    const server = createMcpServer({ timezoneHint });
+
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: undefined,
+      enableJsonResponse: true,
+    });
+
+    try {
+      await server.connect(transport);
+      await transport.handleRequest(req, res, req.body);
+    } finally {
+      await server.close();
+    }
+  });
+
   return app;
 }
 
