@@ -30,7 +30,19 @@ export function convertTime(params: ConvertTimeParams): ConvertTimeResult {
     );
   }
 
-  const [hours, minutes] = time.split(':').map(Number);
+  const timeParts = time.split(':');
+  if (timeParts.length !== 2) {
+    throw new Error(
+      'Invalid time format. Use HH:MM format (e.g., "14:30").'
+    );
+  }
+  const [hours, minutes] = timeParts.map(Number);
+  if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+    throw new Error(
+      'Invalid time format. Hours must be 0-23 and minutes must be 0-59.'
+    );
+  }
+
   const baseDate = date ? new Date(`${date}T00:00:00Z`) : new Date();
   const year = baseDate.getUTCFullYear();
   const month = baseDate.getUTCMonth();

@@ -67,5 +67,25 @@ describe('convert_time tool', () => {
         })
       ).toThrow();
     });
+
+    it('should throw for invalid time format', () => {
+      expect(() =>
+        convertTime({
+          source_timezone: 'UTC',
+          time: '99:99',
+          target_timezone: 'America/New_York',
+        })
+      ).toThrow('Invalid time format');
+    });
+
+    it('should throw for non-numeric time', () => {
+      expect(() =>
+        convertTime({
+          source_timezone: 'UTC',
+          time: 'abc',
+          target_timezone: 'America/New_York',
+        })
+      ).toThrow('Invalid time format');
+    });
   });
 });

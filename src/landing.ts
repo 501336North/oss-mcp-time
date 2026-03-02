@@ -1,5 +1,4 @@
-export function getLandingHtml(): string {
-  return `<!DOCTYPE html>
+const LANDING_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -57,4 +56,7 @@ export function getLandingHtml(): string {
   </div>
 </body>
 </html>`;
+
+export function getLandingHtml(): string {
+  return LANDING_HTML;
 }
