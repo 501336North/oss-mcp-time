@@ -1,0 +1,13 @@
+{
+  "name": "oss-mcp-time",
+  "description": "Accurate time and timezone tools for Claude Code. Stops Claude from guessing dates and times.",
+  "version": "1.0.0",
+  "author": {
+    "name": "One Shot Ship",
+    "url": "https://www.oneshotship.com"
+  },
+  "homepage": "https://one-shot-ship-api.onrender.com/mcp-time",
+  "repository": "https://github.com/501336North/oss-mcp-time",
+  "license": "MIT",
+  "keywords": ["mcp", "time", "timezone", "clock", "date"]
+}

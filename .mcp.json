@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "time-server": {
+      "type": "http",
+      "url": "https://one-shot-ship-api.onrender.com/mcp"
+    }
+  }
+}
