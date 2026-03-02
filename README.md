@@ -4,18 +4,24 @@
 
 A free, hosted MCP server providing accurate time and timezone tools for Claude Code — including remote `/cowork` sessions.
 
-## Quick Setup
+## Install as Plugin
+
+```
+/plugin install oss-mcp-time
+```
+
+## Manual Setup
 
 ```bash
-claude mcp add --transport http time-server https://oss-mcp-time.onrender.com/mcp
+claude mcp add time-server https://one-shot-ship-api.onrender.com/mcp --transport http
 ```
 
 With timezone hint (recommended):
 
 ```bash
-claude mcp add --transport http \
-  --header "X-Timezone: America/New_York" \
-  time-server https://oss-mcp-time.onrender.com/mcp
+claude mcp add time-server https://one-shot-ship-api.onrender.com/mcp \
+  --transport http \
+  --header "X-Timezone: America/New_York"
 ```
 
 Replace `America/New_York` with your [IANA timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
@@ -72,7 +78,7 @@ Claude Code `/cowork` (remote) sessions run on Anthropic's infrastructure, not y
 ## Self-Hosting
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/oss-mcp-time.git
+git clone https://github.com/501336North/oss-mcp-time.git
 cd oss-mcp-time
 npm install
 npm run build
