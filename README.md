@@ -2,15 +2,11 @@
 
 **by [One Shot Ship](https://www.oneshotship.com)**
 
-A free, hosted MCP server providing accurate time and timezone tools for Claude Code — including remote `/cowork` sessions.
+A free, hosted MCP server providing accurate time and timezone tools for Claude Code, Claude Desktop, and Cowork.
 
-## Install as Plugin
+## Setup
 
-```
-/plugin install oss-mcp-time
-```
-
-## Manual Setup
+### Claude Code
 
 ```bash
 claude mcp add time-server https://one-shot-ship-api.onrender.com/mcp --transport http
@@ -23,6 +19,36 @@ claude mcp add time-server https://one-shot-ship-api.onrender.com/mcp \
   --transport http \
   --header "X-Timezone: America/New_York"
 ```
+
+Or install as a plugin:
+
+```
+/plugin install oss-mcp-time
+```
+
+### Claude Desktop / Cowork
+
+Add this to your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "time-server": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote",
+        "https://one-shot-ship-api.onrender.com/mcp"]
+    }
+  }
+}
+```
+
+**Config file location:**
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+
+> Requires [Node.js](https://nodejs.org) 18+. The `mcp-remote` package is downloaded automatically on first use.
+
+Restart Claude Desktop after saving. Works with Cowork sessions too.
 
 Replace `America/New_York` with your [IANA timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
