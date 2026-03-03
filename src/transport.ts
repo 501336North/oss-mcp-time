@@ -16,6 +16,13 @@ export function createApp(): express.Express {
   });
 
   app.post('/mcp', async (req, res) => {
+    // Ensure Accept header includes text/event-stream so the SDK doesn't reject
+    // older clients (e.g. Claude Desktop) that omit it.
+    const accept = req.headers['accept'] || '';
+    if (!accept.includes('text/event-stream')) {
+      req.headers['accept'] = 'application/json, text/event-stream';
+    }
+
     const timezoneHint = req.headers['x-timezone'] as string | undefined;
     const server = createMcpServer({ timezoneHint });
 
