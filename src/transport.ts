@@ -3,8 +3,36 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { getLandingHtml } from './landing.js';
 import { createMcpServer } from './server.js';
 
+// Simple in-memory cache: IP -> { timezone, expiry }
+const tzCache = new Map<string, { timezone: string; expiry: number }>();
+const TZ_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+async function detectTimezone(ip: string): Promise<string | undefined> {
+  const cached = tzCache.get(ip);
+  if (cached && cached.expiry > Date.now()) return cached.timezone;
+
+  try {
+    const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,timezone`);
+    const data = await res.json() as { status: string; timezone?: string };
+    if (data.status === 'success' && data.timezone) {
+      tzCache.set(ip, { timezone: data.timezone, expiry: Date.now() + TZ_CACHE_TTL });
+      return data.timezone;
+    }
+  } catch {
+    // Silently fail — timezone hint is optional
+  }
+  return undefined;
+}
+
+function getClientIp(req: express.Request): string {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string') return forwarded.split(',')[0].trim();
+  return req.socket.remoteAddress || '';
+}
+
 export function createApp(): express.Express {
   const app = express();
+  app.set('trust proxy', true);
   app.use(express.json({ limit: '100kb' }));
 
   app.get('/health', (_req, res) => {
@@ -33,7 +61,12 @@ export function createApp(): express.Express {
       req.headers['accept'] = 'application/json, text/event-stream';
     }
 
-    const timezoneHint = req.headers['x-timezone'] as string | undefined;
+    // Use explicit header first, fall back to IP-based detection
+    let timezoneHint = req.headers['x-timezone'] as string | undefined;
+    if (!timezoneHint) {
+      const ip = getClientIp(req);
+      if (ip) timezoneHint = await detectTimezone(ip);
+    }
     const server = createMcpServer({ timezoneHint });
 
     const transport = new StreamableHTTPServerTransport({
