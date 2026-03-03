@@ -18,8 +18,18 @@ export function createApp(): express.Express {
   app.post('/mcp', async (req, res) => {
     // Ensure Accept header includes text/event-stream so the SDK doesn't reject
     // older clients (e.g. Claude Desktop) that omit it.
+    // Must patch raw headers since the SDK converts to Web Standard Request.
     const accept = req.headers['accept'] || '';
     if (!accept.includes('text/event-stream')) {
+      const raw = (req as any).rawHeaders as string[] | undefined;
+      if (raw) {
+        const idx = raw.findIndex((h: string) => h.toLowerCase() === 'accept');
+        if (idx >= 0) {
+          raw[idx + 1] = 'application/json, text/event-stream';
+        } else {
+          raw.push('Accept', 'application/json, text/event-stream');
+        }
+      }
       req.headers['accept'] = 'application/json, text/event-stream';
     }
 
