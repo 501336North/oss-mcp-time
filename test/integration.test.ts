@@ -62,6 +62,47 @@ describe('Integration: Full MCP tool calls via HTTP', () => {
     expect(result.target_timezone).toBe('Asia/Tokyo');
   });
 
+  it('should default to auto-detected timezone when timezone omitted', async () => {
+    const response = await request(app)
+      .post('/mcp')
+      .set({ ...MCP_HEADERS, 'X-Timezone': 'Europe/London' })
+      .send({
+        jsonrpc: '2.0',
+        id: 13,
+        method: 'tools/call',
+        params: {
+          name: 'get_current_time',
+          arguments: {},
+        },
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.result.content).toHaveLength(1);
+    expect(response.body.result.isError).toBeUndefined();
+
+    const result = JSON.parse(response.body.result.content[0].text);
+    expect(result.timezone).toBe('Europe/London');
+  });
+
+  it('should error when timezone omitted and no hint available', async () => {
+    const response = await request(app)
+      .post('/mcp')
+      .set(MCP_HEADERS)
+      .send({
+        jsonrpc: '2.0',
+        id: 14,
+        method: 'tools/call',
+        params: {
+          name: 'get_current_time',
+          arguments: {},
+        },
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.result.isError).toBe(true);
+    expect(response.body.result.content[0].text).toContain('No timezone provided');
+  });
+
   it('should return error for invalid timezone in tool call', async () => {
     const response = await request(app)
       .post('/mcp')
